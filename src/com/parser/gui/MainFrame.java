@@ -29,7 +29,6 @@ public class MainFrame extends JFrame {
     JTable table;
     JFileChooser chooser;
 
-
     private static final String stringForButtonBegin = "Načíst";
     private static final String stringForExport = "Export";
     private static final String stringForAdmin = "Admin";
