@@ -35,6 +35,7 @@ public class DataParser {
 
     public ArrayList<DataModel> loadDataFromFolder(File folderURL, String matchingInputString, ArrayList<DataModel> resultData) throws ParserConfigurationException, IOException, SAXException {
         String destinationFolder = folderURL.toString();
+        String folderName = "";
         for (File file : FileManager.listFilesMatching(new File(destinationFolder), matchingInputString)) {
             String destinationFile = destinationFolder + File.separator + file.getName();
             if (MainFrame.DEBUG) {
@@ -50,7 +51,11 @@ public class DataParser {
                     votingResult.getSession(), 0, votingResult.getYes(), votingResult.getNo(),
                     votingResult.getAbstained(), votingResult.getNotVoting(), "", archivedFile.getName(), votingResult.getDeputy());
             addUniqueDataModel(resultData, dataModel);
+            folderName = votingResult.session.getNumber();
+
         }
+
+        ApplicationObjects.getInstance().setOutputFolderLocation(ApplicationObjects.getInstance().getOutputFolderLocation()+"\\"+folderName);
 
         return resultData;
     }
@@ -81,6 +86,26 @@ public class DataParser {
 
             String fileUrl = ApplicationObjects.getInstance().getOutputFolderLocation() + File.separator +
                     "ZMC_" + year + "_" + inputData.get(i).getOrderNumber() + ".xml";
+
+
+            File theDir = new File(ApplicationObjects.getInstance().getOutputFolderLocation());
+
+            // if the directory does not exist, create it
+            if (!theDir.exists()) {
+                System.out.println("creating directory: " );
+                boolean result = false;
+
+                try{
+                    theDir.mkdir();
+                    result = true;
+                } catch(SecurityException se){
+                    //handle it
+                }
+                if(result) {
+                    System.out.println("DIR created");
+                }
+            }
+
             File f = new File(fileUrl);
             f.createNewFile();
             PrintWriter writer = new PrintWriter(fileUrl, "UTF-8");

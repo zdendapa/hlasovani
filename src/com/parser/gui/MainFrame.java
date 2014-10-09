@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
     static MainFrame mainFrame;
     Container rootContainer;
     JButton loadFileButton;
+    JButton pridelitButton;
     JButton exportFileButton;
     JButton adminButton;
 
@@ -30,6 +31,7 @@ public class MainFrame extends JFrame {
     JFileChooser chooser;
 
     private static final String stringForButtonBegin = "Načíst";
+    private static final String stringForButtonPridelit = "Přiděl";
     private static final String stringForExport = "Export";
     private static final String stringForAdmin = "Admin";
     private static final String stringMainWindowName = "Parser utility";
@@ -54,10 +56,13 @@ public class MainFrame extends JFrame {
         rootContainer.setLayout(groupLayout);
 
         loadFileButton = new JButton(stringForButtonBegin);
+        pridelitButton = new JButton(stringForButtonPridelit);
         exportFileButton = new JButton(stringForExport);
         adminButton = new JButton(stringForAdmin);
 
         addActionForLoadFileButton();
+        addActionForNacistButton();
+        addActionForPridelitButton();
         addActionForAdminButton();
         addActionForExportButton();
 
@@ -66,29 +71,46 @@ public class MainFrame extends JFrame {
         loadTable();
         rootContainer.add(scrollPane);
 
+
+/*
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 1));
+        buttonPanel.add(loadFileButton);
+        buttonPanel.add(pridelitButton);
+
+        JPanel east = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.weighty = 1;
+        east.add(buttonPanel, gbc);
+        //rootContainer.add(east, BorderLayout.EAST);
+*/
+
         groupLayout.setAutoCreateGaps(true);
         groupLayout.setAutoCreateContainerGaps(true);
 
         groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(LEADING)
-                        .addComponent(scrollPane)
-                )
-                .addGroup(groupLayout.createParallelGroup(LEADING)
-                        .addComponent(loadFileButton)
-                        .addComponent(exportFileButton)
-                        .addComponent(adminButton))
+                        .addGroup(groupLayout.createParallelGroup(LEADING)
+                                        .addComponent(scrollPane)
+                        )
+                        .addGroup(groupLayout.createParallelGroup(LEADING,false)
+                                .addComponent(loadFileButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(exportFileButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pridelitButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(adminButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         groupLayout.setVerticalGroup(groupLayout.createParallelGroup()
 
-                .addComponent(scrollPane)
+                        .addComponent(scrollPane)
 
-                .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(loadFileButton)
-                        .addComponent(exportFileButton)
-                        .addComponent(adminButton)
-                )
+                        .addGroup(groupLayout.createSequentialGroup()
+                                        .addComponent(loadFileButton)
+                                        .addComponent(exportFileButton)
+                                        .addComponent(pridelitButton)
+                                        .addComponent(adminButton)
+                        )
         );
+
 
         pack();
 
@@ -96,6 +118,14 @@ public class MainFrame extends JFrame {
         setSize(900, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+
+
+
+    private void addActionForNacistButton() {
+
+
     }
 
     private void addActionForLoadFileButton() {
@@ -139,6 +169,34 @@ public class MainFrame extends JFrame {
         if(MainFrame.DEBUG){
             System.out.println("inputFolderLocation after clean:"+ApplicationObjects.getInstance().getInputFolderLocation());
         }
+    }
+
+
+    private void addActionForPridelitButton() {
+        pridelitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSelectedRow() != -1) {
+                    //Object[][] dataFromTable = ((TableModel) table.getModel()).getData();
+
+                    int startNumber = Integer.valueOf((Integer) table.getValueAt(table.getSelectedRow(),3));
+                    for (int i=table.getSelectedRow()+1;i<table.getRowCount();i++)
+                    {
+                        if( (Boolean) table.getValueAt(i,4)== true)
+                        {
+                            startNumber ++;
+                            table.setValueAt(startNumber,i,3);
+                        }
+
+                    }
+
+
+                    System.out.println("Saa");
+                    // remove selected row from the model
+                    //model.removeRow(table.getSelectedRow());
+                }
+            }
+        });
     }
 
     private void addActionForAdminButton() {
@@ -210,11 +268,12 @@ public class MainFrame extends JFrame {
         table.getColumnModel().getColumn(1).setPreferredWidth(120);
         table.getColumnModel().getColumn(2).setPreferredWidth(280);
         table.getColumnModel().getColumn(3).setPreferredWidth(75);
-        table.getColumnModel().getColumn(4).setPreferredWidth(30);
+        table.getColumnModel().getColumn(4).setPreferredWidth(70);
         table.getColumnModel().getColumn(5).setPreferredWidth(30);
         table.getColumnModel().getColumn(6).setPreferredWidth(30);
         table.getColumnModel().getColumn(7).setPreferredWidth(30);
-        table.getColumnModel().getColumn(8).setPreferredWidth(60);
+        table.getColumnModel().getColumn(8).setPreferredWidth(30);
+        table.getColumnModel().getColumn(9).setPreferredWidth(60);
         table.getColumnModel().getColumn(3).setCellEditor(
                 new IntegerEditor(1, Integer.MAX_VALUE));
 
@@ -308,8 +367,10 @@ public class MainFrame extends JFrame {
                 tableModel.addRow(new Object[]{
                         dataModelFromXML.get(i).getNumber(),
                         dataModelFromXML.get(i).getTime(),
-                        dataModelFromXML.get(i).getSessionContent(),
+                        //dataModelFromXML.get(i).getSessionContent(),
+                        dataModelFromXML.get(i).getTopicContent(),
                         new Integer(0),
+                        true,
                         dataModelFromXML.get(i).getYes(),
                         dataModelFromXML.get(i).getNo(),
                         dataModelFromXML.get(i).getAbstained(),

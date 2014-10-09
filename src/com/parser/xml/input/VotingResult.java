@@ -31,8 +31,15 @@ public class VotingResult {
     @XStreamAlias("not_voting")
     private int notVoting; // NEH = VotingResult attr: „not_voting“
 
+    //public String session;
     @XStreamAlias("Session")
-    public String session;
+    public Session session;
+    //public String session;
+
+
+    public String getSession() {
+        return this.session.getSession();
+    }
 
     @XStreamAlias("Topic")
     public String topic;
@@ -45,12 +52,10 @@ public class VotingResult {
     @XStreamAlias("Copyright")
     public Copyright copyright;
 
-    public String getSession() {
-        return session;
-    }
+
 
     public void setSession(String session) {
-        this.session = session;
+        //this.session = session;
     }
 
     public int getNumber() {

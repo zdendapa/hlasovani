@@ -10,6 +10,7 @@ class TableModel extends AbstractTableModel {
             "Datum",
             "Název usnesení",
             "Č. usneseni",
+            "Přidělit",
             "ANO",
             "NE",
             "ZDR",
@@ -74,18 +75,18 @@ class TableModel extends AbstractTableModel {
         boolean isAdminLogged = ApplicationObjects.getInstance().isAdminLogged();
         if (MainFrame.DEBUG) {
             System.out.println("isAdminLogged: " + isAdminLogged);
-            System.out.println("isFalse: " + (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2 || col == 4
+            System.out.println("isFalse: " + (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2
                     || col == 5 || col == 6 || col == 7 || col == 8));
         }
-        if (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2 || col == 4
-                || col == 5 || col == 6 || col == 7) {
+        if (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2
+                || col == 5 || col == 6 || col == 7  || col == 8) {
             return false;
         } else {
             return true;
         }
     }
 
-    public void setValueAt(Object value, int row, int col) {
+    public void setValueAt_old(Object value, int row, int col) {
         // if (DEBUG) {
         if (value != null) {
             if (MainFrame.DEBUG) {
@@ -108,6 +109,30 @@ class TableModel extends AbstractTableModel {
                     }
                 }
             }
+
+            if (MainFrame.DEBUG) {
+                System.out.println("New value of data:");
+                printDebugData();
+            }
+        }
+    }
+
+
+
+    public void setValueAt(Object value, int row, int col) {
+        // if (DEBUG) {
+        if (value != null) {
+            if (MainFrame.DEBUG) {
+                System.out.println("Setting value at " + row + "," + col
+                        + " to " + value
+                        + " (an instance of "
+                        + value.getClass() + ")");
+            }
+            //}
+
+            data[row][col] = value;
+            fireTableCellUpdated(row, col);
+
 
             if (MainFrame.DEBUG) {
                 System.out.println("New value of data:");

@@ -12,7 +12,7 @@ public class ApplicationObjects {
     //folder for copying files from inputFolderLocation
     private static String backupFolderLocation = "D:\\2014\\VoteParserDataForTesting\\backup_folder";
     //output folder for new xmls
-    private static String outputFolderLocation = "D:\\2014\\VoteParserDataForTesting\\output_folder";
+    private static String outputFolderLocation = "C:\\z\\test\\export";
     private static ArrayList<DataModel> inputDataFromXML;
     private static boolean isAdminLogged;
 
