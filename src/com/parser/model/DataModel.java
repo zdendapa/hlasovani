@@ -9,7 +9,9 @@ import java.util.ArrayList;
 public class DataModel {
     public static final String dateFormat = "dd.MM.yyyy hh:mm:ss";
     private int number; //# = VotingResult
-    private String time; //Datum = VotingResult
+    public String posunTime; //Datum = VotingResult
+    public String zacatekNasledujiciho; //Datum = VotingResult
+    public String time; //Datum = VotingResult
     private String sessionContent;//Nazev usneseni VotingResult/Session content:  <Session number="201401" election_period="1">22. Zasedání ZMČ Praha 3</Session>
     private String topicContent;
     //BY DEFAULT THIS FIELD EMPTY and mayby required
@@ -31,9 +33,11 @@ public class DataModel {
 
     }
 
-    public DataModel(int number, String topicContent, String time, String sessionContent, int orderNumber, int yes, int no, int abstained, int notVoting, String note, String fileName, ArrayList<Deputy> deputies) {
+    public DataModel(int number, String topicContent, String posunTime, String zacatekNasledujiciho, String time, String sessionContent, int orderNumber, int yes, int no, int abstained, int notVoting, String note, String fileName, ArrayList<Deputy> deputies) {
         this.number = number;
         this.topicContent = topicContent;
+        this.posunTime = posunTime;
+        this.zacatekNasledujiciho = zacatekNasledujiciho;
         this.time = time;
         this.sessionContent = sessionContent;
         this.orderNumber = orderNumber;
@@ -67,6 +71,14 @@ public class DataModel {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public void setPosunTime(String posunTime) {
+        this.posunTime = posunTime;
+    }
+
+    public String getPosunTime() {
+        return posunTime;
     }
 
     public String getSessionContent() {

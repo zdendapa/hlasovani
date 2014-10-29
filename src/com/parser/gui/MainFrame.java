@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static javax.swing.GroupLayout.Alignment.LEADING;
 
@@ -26,6 +28,8 @@ public class MainFrame extends JFrame {
     JButton pridelitButton;
     JButton exportFileButton;
     JButton adminButton;
+    JLabel lbUserName;
+    JLabel lbPrihlasen;
 
     JTable table;
     JFileChooser chooser;
@@ -34,17 +38,17 @@ public class MainFrame extends JFrame {
     private static final String stringForButtonPridelit = "Přiděl";
     private static final String stringForExport = "Export";
     private static final String stringForAdmin = "Admin";
-    private static final String stringMainWindowName = "Parser utility";
-    private static final String stringSelectImportFolder = "Select input folder";
-    private static final String stringMessageChooseAnotherInputFolder = "Input folder is not chosen. Please try again.";
-    private static final String stringEnterPass = "Enter a password:";
+    private static final String stringMainWindowName = "Hlasování";
+    private static final String stringSelectImportFolder = "Vyberte zdrojový adresář";
+    private static final String stringMessageChooseAnotherInputFolder = "Nebyl vybrán zdrojový adresář. Vyberte prosím znovu.";
+    private static final String stringEnterPass = "Vložte heslo:";
     private static final String stringTruePassword = "Hilmar";
-    private static final String stringCantStartImport = "Can't export. No data in table.\nPlease load data for the first.";
-    private static final String stringBadCUsneseni = "Can't export. Please, initialize all Č. usneseni values.\nValue must be not equals 0.";
-    private static final String stringDataSuccessfullyExported = "Data successfully exported.";
-    private static final String stringDataNotSuccessfullyExported = "During export occured error.\nPlease check that output folder exists.";
-    private static final String stringNoValidFileForParsing = "No valid files were found.\nPlease try to use another input folder";
-    private static final String  stringNoMatchingFiles="Please choose another input folder.\nNo matching [0-9]{4}.xml files found.";
+    private static final String stringCantStartImport = "Nelze exportovat, tabulka neobsahuje žádná data.\nNejříve načtěte data.";
+    private static final String stringBadCUsneseni = "Nelze exportovat.\nPřiřaďte čísla usnesení.";
+    private static final String stringDataSuccessfullyExported = "Vyexportováno.";
+    private static final String stringDataNotSuccessfullyExported = "Chyba během exportu.\nZkontrolujte prosím výstupní adresář..";
+    private static final String stringNoValidFileForParsing = "Nebyly nalezeny vstupní soubory.\nZkontrolujte znovu, nebo vyberte jiný adreář";
+    private static final String  stringNoMatchingFiles="Nebyly nalezeny vstupní soubory.\nŽádné neodpovídají filtru: [0-9]{4}.xml";
     public MainFrame() {
         initUserInterfaceElements();
     }
@@ -59,6 +63,10 @@ public class MainFrame extends JFrame {
         pridelitButton = new JButton(stringForButtonPridelit);
         exportFileButton = new JButton(stringForExport);
         adminButton = new JButton(stringForAdmin);
+        lbUserName = new JLabel("Admin",SwingConstants.CENTER);
+        lbUserName.setVisible(false);
+        lbPrihlasen = new JLabel("přihlášen",SwingConstants.CENTER);
+        lbPrihlasen.setVisible(false);
 
         addActionForLoadFileButton();
         addActionForNacistButton();
@@ -96,7 +104,10 @@ public class MainFrame extends JFrame {
                                 .addComponent(loadFileButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(exportFileButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(pridelitButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(adminButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(adminButton,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbUserName,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lbPrihlasen,GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        )
         );
 
         groupLayout.setVerticalGroup(groupLayout.createParallelGroup()
@@ -108,6 +119,8 @@ public class MainFrame extends JFrame {
                                         .addComponent(exportFileButton)
                                         .addComponent(pridelitButton)
                                         .addComponent(adminButton)
+                                        .addComponent(lbUserName)
+                                        .addComponent(lbPrihlasen)
                         )
         );
 
@@ -179,13 +192,13 @@ public class MainFrame extends JFrame {
                 if (table.getSelectedRow() != -1) {
                     //Object[][] dataFromTable = ((TableModel) table.getModel()).getData();
 
-                    int startNumber = Integer.valueOf((Integer) table.getValueAt(table.getSelectedRow(),3));
+                    int startNumber = Integer.valueOf((Integer) table.getValueAt(table.getSelectedRow(),4));
                     for (int i=table.getSelectedRow()+1;i<table.getRowCount();i++)
                     {
-                        if( (Boolean) table.getValueAt(i,4)== true)
+                        if( (Boolean) table.getValueAt(i,5)== true)
                         {
                             startNumber ++;
-                            table.setValueAt(startNumber,i,3);
+                            table.setValueAt(startNumber,i,4);
                         }
 
                     }
@@ -211,13 +224,15 @@ public class MainFrame extends JFrame {
                 String[] options = new String[]{"OK", "Cancel"};
                 int option = JOptionPane.showOptionDialog(null, panel, "Admin",
                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options, options[1]);
+                        null, options, options[0]);
                 if (option == 0) // pressing OK button
                 {
                     String password = new String(pass.getPassword());
 
                     if (stringTruePassword.equals(password)) {
                         ApplicationObjects.getInstance().setAdminLogged(true);
+                        lbPrihlasen.setVisible(true);
+                        lbUserName.setVisible(true);
                     } else {
                         ApplicationObjects.getInstance().setAdminLogged(false);
                     }
@@ -239,7 +254,7 @@ public class MainFrame extends JFrame {
                 if (dataFromTable.length > 0) {
                     boolean isNotInitializedCUsneseni = false;
                     for (int i = 0; i < dataFromTable.length; i++) {
-                        if ((Integer) dataFromTable[i][3] == 0) {
+                        if ((Integer) dataFromTable[i][4] == 0 && (Boolean) dataFromTable[i][5]== true) {
                             isNotInitializedCUsneseni = true;
                         }
                     }
@@ -266,14 +281,15 @@ public class MainFrame extends JFrame {
         table.setFillsViewportHeight(true);
         table.getColumnModel().getColumn(0).setPreferredWidth(30);
         table.getColumnModel().getColumn(1).setPreferredWidth(120);
-        table.getColumnModel().getColumn(2).setPreferredWidth(280);
-        table.getColumnModel().getColumn(3).setPreferredWidth(75);
-        table.getColumnModel().getColumn(4).setPreferredWidth(70);
-        table.getColumnModel().getColumn(5).setPreferredWidth(30);
+        table.getColumnModel().getColumn(2).setPreferredWidth(80);
+        table.getColumnModel().getColumn(3).setPreferredWidth(280);
+        table.getColumnModel().getColumn(4).setPreferredWidth(75);
+        table.getColumnModel().getColumn(5).setPreferredWidth(70);
         table.getColumnModel().getColumn(6).setPreferredWidth(30);
         table.getColumnModel().getColumn(7).setPreferredWidth(30);
         table.getColumnModel().getColumn(8).setPreferredWidth(30);
-        table.getColumnModel().getColumn(9).setPreferredWidth(60);
+        table.getColumnModel().getColumn(9).setPreferredWidth(30);
+        table.getColumnModel().getColumn(10).setPreferredWidth(60);
         table.getColumnModel().getColumn(3).setCellEditor(
                 new IntegerEditor(1, Integer.MAX_VALUE));
 
@@ -327,15 +343,42 @@ public class MainFrame extends JFrame {
         Object[][] dataFromTable = ((TableModel) table.getModel()).getData();
         for (int i = 0; i < inputData.size(); i++) {
             inputData.get(i).setTime((String) dataFromTable[i][1]);
-            inputData.get(i).setOrderNumber((Integer) dataFromTable[i][3]);
+            inputData.get(i).setPosunTime((String) dataFromTable[i][2]);
+            inputData.get(i).setOrderNumber((Integer) dataFromTable[i][4]);
+
         }
+
+        Boolean vyexportovano = true;
+
         try {
             DataParser.getInstance().exportDataToXml();
-            JOptionPane.showMessageDialog(null, stringDataSuccessfullyExported);
+            //JOptionPane.showMessageDialog(null, stringDataSuccessfullyExported);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, stringDataNotSuccessfullyExported);
+            vyexportovano = false;
             e.printStackTrace();
         }
+
+        try {
+            DataParser.getInstance().exportDataToCVS();
+            //JOptionPane.showMessageDialog(null, stringDataSuccessfullyExported);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Soubor csv.csv se nepodařilo vyexportovat");
+            vyexportovano = false;
+            e.printStackTrace();
+        }
+
+        try {
+            DataParser.getInstance().exportDataToChapters();
+            //JOptionPane.showMessageDialog(null, stringDataSuccessfullyExported);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Soubor chapters.txt se nepodařilo vyexportovat");
+            vyexportovano = false;
+            e.printStackTrace();
+        }
+
+        if(vyexportovano) JOptionPane.showMessageDialog(null, stringDataSuccessfullyExported);
+
     }
 
     private void processCopyingFilesFromInputToBackup() {
@@ -363,10 +406,52 @@ public class MainFrame extends JFrame {
         TableModel tableModel = (TableModel) table.getModel();
 
         if (dataModelFromXML != null && dataModelFromXML.size() > 0) {
+
+
+            String videoPosun="";
+            Calendar calStartTotal = Calendar.getInstance();
+
+
             for (int i = 0; i < dataModelFromXML.size(); i++) {
+
+                /* vzpocet posunTime delam v DataParser
+                if(i==0)
+                {
+                    videoPosun = "00:00:00";
+                    calStartTotal = makeCal(dataModelFromXML.get(i).getTime());
+
+
+                } else
+                {
+                    Calendar calEnd = makeCal(dataModelFromXML.get(i).zacatekNasledujiciho);
+                    Calendar calStart = makeCal(dataModelFromXML.get(i).getTime());
+
+                    long diffStart = calStart.getTimeInMillis() - calStartTotal.getTimeInMillis();
+                    long diffEnd = calEnd.getTimeInMillis() - calStartTotal.getTimeInMillis();
+
+                    // delka
+                    //long diffStart = calEnd.getTimeInMillis() - calStart.getTimeInMillis();
+
+
+                    long second = (diffStart / 1000) % 60;
+                    long minute = (diffStart / (1000 * 60)) % 60;
+                    long hour = (diffStart / (1000 * 60 * 60)) % 24;
+
+                    videoPosun = lontTimeToString(hour) + ":" + lontTimeToString(minute) + ":" + lontTimeToString(second);
+
+
+
+
+                    //videoPosun = diff / (60 * 60 * 1000) + ":" + diff / (60 * 1000) + ":" + diff / 1000;
+                    //videoPosun = c.HOUR + ":" + c.MINUTE + ":" + c.MILLISECOND;
+                }
+                */
+
                 tableModel.addRow(new Object[]{
                         dataModelFromXML.get(i).getNumber(),
                         dataModelFromXML.get(i).getTime(),
+
+                        dataModelFromXML.get(i).getPosunTime(),//dataModelFromXML.get(i).getTime(),//"0:00:00",
                         //dataModelFromXML.get(i).getSessionContent(),
                         dataModelFromXML.get(i).getTopicContent(),
                         new Integer(0),
@@ -381,6 +466,27 @@ public class MainFrame extends JFrame {
         } else {
             JOptionPane.showMessageDialog(null, stringNoValidFileForParsing);
         }
+    }
+
+    public String lontTimeToString(long l)
+    {
+        String s = Long.toString(l);
+        if(s.length()==1) s = "0" + s;
+        if(s.length()==0) s = "00";
+        return s;
+    }
+
+    public Calendar makeCal(String s)
+    {
+        Calendar cal = Calendar.getInstance();
+        String timeArr[] = s.split(" ");
+        timeArr = timeArr[timeArr.length-1].split(":");
+
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt((timeArr[0])));
+        cal.set(Calendar.MINUTE, Integer.parseInt((timeArr[1])));
+        cal.set(Calendar.SECOND, Integer.parseInt((timeArr[2])));
+
+        return cal;
     }
 
     public ArrayList<DataModel> loadDataFromFolderWithWaitingDialog(final File folderURL, final String matchingInputString) throws ParserConfigurationException, IOException, SAXException {
@@ -454,7 +560,7 @@ public class MainFrame extends JFrame {
     private JDialog initWaitingDialog() {
         final JDialog loading = new JDialog(mainFrame);
         JPanel p1 = new JPanel(new BorderLayout());
-        p1.add(new JLabel("Please wait..."), BorderLayout.CENTER);
+        p1.add(new JLabel("Počkejte prosím..."), BorderLayout.CENTER);
         loading.setUndecorated(true);
         loading.getContentPane().add(p1);
         loading.pack();

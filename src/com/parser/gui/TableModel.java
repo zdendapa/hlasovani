@@ -8,6 +8,7 @@ class TableModel extends AbstractTableModel {
     private String[] columnNames = {
             "#",
             "Datum",
+            "Video posun",
             "Název usnesení",
             "Č. usneseni",
             "Přidělit",
@@ -78,13 +79,15 @@ class TableModel extends AbstractTableModel {
             System.out.println("isFalse: " + (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2
                     || col == 5 || col == 6 || col == 7 || col == 8));
         }
-        if (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 2
-                || col == 5 || col == 6 || col == 7  || col == 8) {
+        if (col < 1 || col == 0 || (col == 1 && !isAdminLogged) || col == 3
+                || col == 6 || col == 7  || col == 8 || col == 9  || col == 10) {
             return false;
         } else {
             return true;
         }
     }
+
+
 
     public void setValueAt_old(Object value, int row, int col) {
         // if (DEBUG) {
